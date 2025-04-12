@@ -4,6 +4,7 @@ import '../providers/accelerometer_provider.dart';
 import '../services/sensor_service.dart';
 import '../widgets/accelerometer_chart.dart';
 import '../widgets/pothole_detection_banner.dart';
+import '../widgets/sensitivity_control.dart';
 
 class HomeScreen extends StatelessWidget {
   final String title;
@@ -32,7 +33,22 @@ class HomeScreen extends StatelessWidget {
         ),
         body: Stack(
           children: [
-            SingleChildScrollView(child: AccelerometerChart()),
+            SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 16),
+
+                  // Add the sensitivity control widget
+                  const SensitivityControl(),
+
+                  const SizedBox(height: 8),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  const AccelerometerChart(),
+                ],
+              ),
+            ),
             // Pothole detection banner that shows when a pothole is detected
             Positioned(
               bottom: 16,
