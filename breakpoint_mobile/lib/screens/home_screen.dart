@@ -62,9 +62,9 @@ class HomeScreen extends StatelessWidget {
                   const SensitivityControl(),
 
                   const SizedBox(height: 8),
-                  const Divider(),
-                  const SizedBox(height: 8),
-                  const AccelerometerChart(),
+                  // const Divider(),
+                  // const SizedBox(height: 8),
+                  // const AccelerometerChart(),
                 ],
               ),
             ),
