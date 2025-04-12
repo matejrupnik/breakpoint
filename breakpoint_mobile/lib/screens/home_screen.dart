@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/accelerometer_provider.dart';
 import '../services/sensor_service.dart';
 import '../widgets/accelerometer_chart.dart';
+import '../widgets/pothole_detection_banner.dart';
 
 class HomeScreen extends StatelessWidget {
   final String title;
@@ -29,32 +30,59 @@ class HomeScreen extends StatelessWidget {
           title: Text(title),
           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         ),
-        body: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.warning_rounded, size: 80, color: Colors.amber),
-              const SizedBox(height: 24),
-              Text(
-                'Pothole Detection App',
-                style: Theme.of(context).textTheme.headlineMedium,
-                textAlign: TextAlign.center,
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.warning_rounded, size: 80, color: Colors.amber),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Pothole Detection App',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 32.0),
+                    child: Text(
+                      'This application helps detect potholes while driving to improve road safety.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  const AccelerometerChart(),
+                ],
               ),
-              const SizedBox(height: 16),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32.0),
-                child: Text(
-                  'This application helps detect potholes while driving to improve road safety.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16),
-                ),
+            ),
+            // Pothole detection banner that shows when a pothole is detected
+            Positioned(
+              bottom: 16,
+              left: 16,
+              right: 16,
+              child: Consumer<AccelerometerProvider>(
+                builder: (context, provider, child) {
+                  // Only show the banner when a pothole is detected
+                  if (!provider.potholeDetected) {
+                    return const SizedBox.shrink(); // Return empty widget when no pothole detected
+                  }
+                  
+                  // Show the banner with an animation
+                  return AnimatedOpacity(
+                    opacity: provider.potholeDetected ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 500),
+                    child: PotholeDetectionBanner(
+                      detectionTime: provider.lastPotholeTime,
+                    ),
+                  );
+                },
               ),
-              const SizedBox(height: 24),
-              const Divider(),
-              const SizedBox(height: 8),
-              const AccelerometerChart(),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
