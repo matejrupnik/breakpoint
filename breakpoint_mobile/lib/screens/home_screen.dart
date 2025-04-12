@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/accelerometer_provider.dart';
+import '../providers/road_surface_provider.dart';
 import '../services/sensor_service.dart';
 import '../widgets/accelerometer_chart.dart';
 import '../widgets/pothole_detection_banner.dart';
 import '../widgets/sensitivity_control.dart';
+import '../widgets/road_surface_indicator.dart';
 
 class HomeScreen extends StatelessWidget {
   final String title;
@@ -25,6 +27,16 @@ class HomeScreen extends StatelessWidget {
               (context, sensorService, previous) =>
                   previous ?? AccelerometerProvider(sensorService),
         ),
+        // Add the RoadSurfaceProvider
+        ChangeNotifierProxyProvider<SensorService, RoadSurfaceProvider>(
+          create:
+              (context) => RoadSurfaceProvider(
+                Provider.of<SensorService>(context, listen: false),
+              ),
+          update:
+              (context, sensorService, previous) =>
+                  previous ?? RoadSurfaceProvider(sensorService),
+        ),
       ],
       child: Scaffold(
         appBar: AppBar(
@@ -39,7 +51,10 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 16),
 
-                  // Add the sensitivity control widget
+                  // Road surface indicator moved to the top
+                  const RoadSurfaceIndicator(),
+
+                  // Sensitivity control now second
                   const SensitivityControl(),
 
                   const SizedBox(height: 8),
