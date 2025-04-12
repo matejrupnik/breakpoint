@@ -7,6 +7,7 @@ import '../widgets/accelerometer_chart.dart';
 import '../widgets/pothole_detection_banner.dart';
 import '../widgets/sensitivity_control.dart';
 import '../widgets/road_surface_indicator.dart';
+import '../widgets/road_surface_settings.dart';
 
 class HomeScreen extends StatelessWidget {
   final String title;
@@ -51,10 +52,13 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: 16),
 
-                  // Road surface indicator moved to the top
+                  // Road surface indicator at the top
                   const RoadSurfaceIndicator(),
 
-                  // Sensitivity control now second
+                  // Road surface settings panel
+                  const RoadSurfaceSettings(),
+
+                  // Sensitivity control for pothole detection
                   const SensitivityControl(),
 
                   const SizedBox(height: 8),

@@ -8,10 +8,13 @@ import '../services/sensor_service.dart';
 class RoadSurfaceProvider with ChangeNotifier {
   final SensorService _sensorService;
 
-  // Store 5 seconds of data at 20Hz sampling rate (100 samples)
-  final int _windowSize = 100;
+  // Store 2 seconds of data at 20Hz sampling rate (40 samples)
+  final int _windowSize = 40;
   final ListQueue<AccelerometerData> _dataWindow =
       ListQueue<AccelerometerData>();
+
+  // Track recent data to detect rapid stabilization
+  final int _recentDataSize = 10; // Last 0.5 seconds (at 20Hz)
 
   StreamSubscription<AccelerometerData>? _subscription;
 
@@ -26,10 +29,27 @@ class RoadSurfaceProvider with ChangeNotifier {
   // Moving average of vertical acceleration
   double _baselineAcceleration = 0.0;
 
-  // Quality thresholds
-  final double _smoothThreshold = 0.8;
-  final double _moderateThreshold = 2.0;
-  final double _roughThreshold = 4.0;
+  // Quality thresholds with getters and setters
+  double _smoothThreshold = 0.8;
+  double _moderateThreshold = 2.0;
+  double _roughThreshold = 4.0;
+
+  double get smoothThreshold => _smoothThreshold;
+  double get moderateThreshold => _moderateThreshold;
+  double get roughThreshold => _roughThreshold;
+
+  // Method to update all thresholds at once
+  void updateThresholds(double smooth, double moderate, double rough) {
+    // Ensure thresholds are in ascending order
+    _smoothThreshold = smooth;
+    _moderateThreshold = max(smooth + 0.1, moderate);
+    _roughThreshold = max(_moderateThreshold + 0.1, rough);
+    notifyListeners();
+  }
+
+  // Flags to track stability
+  bool _wasRecentlyStable = false;
+  int _stableCounter = 0;
 
   RoadSurfaceProvider(this._sensorService) {
     _initialize();
@@ -46,7 +66,7 @@ class RoadSurfaceProvider with ChangeNotifier {
     // Add data to our window
     _dataWindow.add(data);
 
-    // Keep only the most recent 5 seconds of data
+    // Keep only the most recent 2 seconds of data
     if (_dataWindow.length > _windowSize) {
       _dataWindow.removeFirst();
     }
@@ -70,8 +90,8 @@ class RoadSurfaceProvider with ChangeNotifier {
     }
     double mean = sum / _dataWindow.length;
 
-    // Update baseline with exponential moving average
-    const alpha = 0.05;
+    // Update baseline with exponential moving average - faster adaptation
+    const alpha = 0.2; // Increased from 0.05 to 0.2 for faster adaptation
     _baselineAcceleration = (1 - alpha) * _baselineAcceleration + alpha * mean;
 
     // Second pass: calculate standard deviation
@@ -82,6 +102,49 @@ class RoadSurfaceProvider with ChangeNotifier {
 
     double variance = sumSquared / _dataWindow.length;
     double stdDev = sqrt(variance);
+
+    // Check for rapid stabilization: analyze just the most recent samples
+    if (_dataWindow.length >= _recentDataSize) {
+      double recentSum = 0;
+      double recentSumSquared = 0;
+      double recentMean = 0;
+
+      // Get most recent samples
+      List<AccelerometerData> recentData = _dataWindow.toList().sublist(
+        _dataWindow.length - _recentDataSize,
+      );
+
+      // Calculate mean for recent data
+      for (var data in recentData) {
+        recentSum += data.verticalAcceleration;
+      }
+      recentMean = recentSum / _recentDataSize;
+
+      // Calculate variance for recent data
+      for (var data in recentData) {
+        double deviation = data.verticalAcceleration - recentMean;
+        recentSumSquared += deviation * deviation;
+      }
+
+      double recentVariance = recentSumSquared / _recentDataSize;
+      double recentStdDev = sqrt(recentVariance);
+
+      // If recent data is very stable (much more stable than full window)
+      // and overall roughness is above smooth threshold
+      if (recentStdDev < 0.3 && stdDev > _smoothThreshold) {
+        _stableCounter++;
+
+        // If stable for a few consecutive readings, force quicker transition
+        if (_stableCounter >= 3) {
+          _wasRecentlyStable = true;
+          // Blend the full window result with recent stable result
+          stdDev = stdDev * 0.3 + recentStdDev * 0.7;
+        }
+      } else {
+        _stableCounter = 0;
+        _wasRecentlyStable = false;
+      }
+    }
 
     // Update roughness index (scale to a more intuitive range)
     _roughnessIndex = stdDev;

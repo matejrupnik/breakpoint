@@ -24,11 +24,6 @@ class SensitivityControl extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  'Current threshold: ${provider.potholeThreshold.toStringAsFixed(1)} m/s²',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 4),
                 Row(
                   children: const [
                     Text('High Sensitivity'),
@@ -45,12 +40,6 @@ class SensitivityControl extends StatelessWidget {
                   onChanged: (value) {
                     provider.potholeThreshold = value;
                   },
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '• Lower values: Detect smaller bumps (may have false positives)\n'
-                  '• Higher values: Only detect significant potholes',
-                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
             ),
