@@ -1,0 +1,20 @@
+services:
+  api:
+    image: matejrupnik/breakpoint:local
+    env_file:
+      - .env
+    build: .
+    ports:
+      - "4000:4000"
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${BREAKPOINT_DB}
+      POSTGRES_USER: ${BREAKPOINT_DB_USER}
+      POSTGRES_PASSWORD: ${BREAKPOINT_DB_PASSWORD}
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
