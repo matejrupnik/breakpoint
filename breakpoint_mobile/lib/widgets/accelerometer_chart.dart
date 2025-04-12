@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/accelerometer_provider.dart';
 
 class AccelerometerChart extends StatelessWidget {
-  const AccelerometerChart({Key? key}) : super(key: key);
+  const AccelerometerChart({super.key});
 
   @override
   Widget build(BuildContext context) {

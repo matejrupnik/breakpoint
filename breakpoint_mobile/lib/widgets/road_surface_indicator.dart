@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/road_surface_provider.dart';
 
 class RoadSurfaceIndicator extends StatelessWidget {
-  const RoadSurfaceIndicator({Key? key}) : super(key: key);
+  const RoadSurfaceIndicator({super.key});
 
   @override
   Widget build(BuildContext context) {

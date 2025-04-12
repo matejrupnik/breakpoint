@@ -25,14 +25,14 @@ class SensorService {
   DateTime? _lastSampleTime;
 
   // Current device orientation data
-  Vector3 _gravity = Vector3(
+  final Vector3 _gravity = Vector3(
     0,
     0,
     9.81,
   ); // Default gravity vector pointing down
 
   // Buffer for user acceleration (without gravity)
-  Vector3 _userAcceleration = Vector3.zero();
+  final Vector3 _userAcceleration = Vector3.zero();
 
   // Initialize the service and start listening to the sensors
   void initialize() {

@@ -68,10 +68,12 @@ class AccelerometerProvider with ChangeNotifier {
     }
 
     // Update min/max vertical values for chart scaling
-    if (data.verticalAcceleration < _minVertical)
+    if (data.verticalAcceleration < _minVertical) {
       _minVertical = data.verticalAcceleration;
-    if (data.verticalAcceleration > _maxVertical)
+    }
+    if (data.verticalAcceleration > _maxVertical) {
       _maxVertical = data.verticalAcceleration;
+    }
 
     // Check for pothole based on vertical acceleration
     _checkForPothole(data);
