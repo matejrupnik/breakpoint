@@ -32,33 +32,7 @@ class HomeScreen extends StatelessWidget {
         ),
         body: Stack(
           children: [
-            SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.warning_rounded, size: 80, color: Colors.amber),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Pothole Detection App',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 32.0),
-                    child: Text(
-                      'This application helps detect potholes while driving to improve road safety.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  const Divider(),
-                  const SizedBox(height: 8),
-                  const AccelerometerChart(),
-                ],
-              ),
-            ),
+            SingleChildScrollView(child: AccelerometerChart()),
             // Pothole detection banner that shows when a pothole is detected
             Positioned(
               bottom: 16,
@@ -70,7 +44,7 @@ class HomeScreen extends StatelessWidget {
                   if (!provider.potholeDetected) {
                     return const SizedBox.shrink(); // Return empty widget when no pothole detected
                   }
-                  
+
                   // Show the banner with an animation
                   return AnimatedOpacity(
                     opacity: provider.potholeDetected ? 1.0 : 0.0,

@@ -3,18 +3,17 @@ import 'package:intl/intl.dart';
 
 class PotholeDetectionBanner extends StatelessWidget {
   final DateTime? detectionTime;
-  
-  const PotholeDetectionBanner({
-    Key? key,
-    required this.detectionTime,
-  }) : super(key: key);
+
+  const PotholeDetectionBanner({Key? key, required this.detectionTime})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final timeString = detectionTime != null 
-        ? DateFormat('HH:mm:ss').format(detectionTime!)
-        : 'Just now';
-        
+    final timeString =
+        detectionTime != null
+            ? DateFormat('HH:mm:ss').format(detectionTime!)
+            : 'Just now';
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
@@ -55,10 +54,7 @@ class PotholeDetectionBanner extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       'Time: $timeString',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
                     ),
                   ],
                 ),

@@ -24,62 +24,60 @@ class AccelerometerChart extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Z-Axis Acceleration',
+                'Vertical Acceleration',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
               Text(
-                'Current: ${dataPoints.isNotEmpty ? dataPoints.last.z.toStringAsFixed(2) : "0.00"} m/s²',
+                'Current: ${dataPoints.isNotEmpty ? dataPoints.last.verticalAcceleration.toStringAsFixed(2) : "0.00"} m/s²',
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
               SizedBox(
-                height: 200,
+                height: 300,
                 child: LineChart(
                   LineChartData(
-                    minY: provider.minZ,
-                    maxY: provider.maxZ,
-                    titlesData: FlTitlesData(
+                    gridData: const FlGridData(show: true),
+                    titlesData: const FlTitlesData(
+                      rightTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      topTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
                       leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 40,
-                          getTitlesWidget: (value, meta) {
-                            return Text(
-                              value.toStringAsFixed(1),
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 10,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      bottomTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      rightTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false),
-                      ),
-                      topTitles: const AxisTitles(
                         sideTitles: SideTitles(showTitles: false),
                       ),
                     ),
-                    gridData: const FlGridData(show: true),
-                    borderData: FlBorderData(show: true),
+                    borderData: FlBorderData(
+                      show: true,
+                      border: Border.all(color: const Color(0xff37434d)),
+                    ),
+                    minX: 0,
+                    maxX: (dataPoints.length - 1).toDouble(),
+                    minY: provider.minVertical,
+                    maxY: provider.maxVertical,
                     lineBarsData: [
                       LineChartBarData(
-                        spots: _createSpots(dataPoints),
-                        isCurved: true,
-                        color: Colors.blue,
-                        barWidth: 3,
-                        dotData: const FlDotData(show: false),
-                        belowBarData: BarAreaData(
-                          show: true,
-                          color: Colors.blue.withOpacity(0.2),
+                        spots: List.generate(
+                          dataPoints.length,
+                          (index) => FlSpot(
+                            index.toDouble(),
+                            dataPoints[index].verticalAcceleration,
+                          ),
                         ),
+                        isCurved: false,
+                        color: Colors.blue,
+                        barWidth: 2,
+                        isStrokeCapRound: true,
+                        dotData: const FlDotData(show: false),
+                        belowBarData: BarAreaData(show: false),
                       ),
                     ],
+                    lineTouchData: const LineTouchData(enabled: false),
                   ),
                 ),
               ),
@@ -90,13 +88,23 @@ class AccelerometerChart extends StatelessWidget {
     );
   }
 
-  List<FlSpot> _createSpots(List<dynamic> dataPoints) {
-    final spots = <FlSpot>[];
+  Widget _bottomTitleWidgets(double value, TitleMeta meta) {
+    const style = TextStyle(fontWeight: FontWeight.bold, fontSize: 10);
 
-    for (int i = 0; i < dataPoints.length; i++) {
-      spots.add(FlSpot(i.toDouble(), dataPoints[i].z));
-    }
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 8,
+      child: Text('${value.toInt()}', style: style),
+    );
+  }
 
-    return spots;
+  Widget _leftTitleWidgets(double value, TitleMeta meta) {
+    const style = TextStyle(fontWeight: FontWeight.bold, fontSize: 10);
+
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 8,
+      child: Text(value.toStringAsFixed(1), style: style),
+    );
   }
 }

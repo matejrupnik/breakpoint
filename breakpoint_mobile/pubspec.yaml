@@ -39,6 +39,7 @@ dependencies:
   sensors_plus: ^4.0.2  # For accessing device sensors
   fl_chart: ^0.66.0     # For creating charts
   intl: ^0.19.0         # For date formatting
+  vector_math: ^2.1.4   # For vector math calculations
 
 dev_dependencies:
   flutter_test:
