@@ -146,22 +146,6 @@ export default function Map({
         ))}
       </MapGL>
       
-      {/* <div className="info-overlay" style={{ 
-        position: 'absolute', 
-        bottom: 0, 
-        left: 0, 
-        right: 0, 
-        zIndex: 10, 
-        padding: '10px', 
-        backgroundColor: 'rgba(255,255,255,0.7)',
-        textAlign: 'center'
-      }}>
-        {potholes.length > 0 ? (
-          <p>Showing {potholes.length} potholes from API</p>
-        ) : (
-          !isLoading && <p>No potholes found</p>
-        )}
-      </div> */}
     </div>
   );
 }
