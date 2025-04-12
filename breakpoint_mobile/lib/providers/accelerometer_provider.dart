@@ -3,9 +3,11 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import '../models/accelerometer_data.dart';
 import '../services/sensor_service.dart';
+import '../services/pothole_api_service.dart';
 
 class AccelerometerProvider with ChangeNotifier {
   final SensorService _sensorService;
+  final PotholeApiService _apiService = PotholeApiService();
   final int _maxDataPoints;
   final ListQueue<AccelerometerData> _dataPoints =
       ListQueue<AccelerometerData>();
@@ -103,11 +105,32 @@ class AccelerometerProvider with ChangeNotifier {
         _potholeDetected = true;
         _lastPotholeTime = data.timestamp;
 
+        // Make an API call to report the pothole
+        _reportPothole(data);
+
         // Reset the detection flag after 1 second to allow for new detections
         Future.delayed(const Duration(seconds: 1), () {
           _potholeDetected = false;
           notifyListeners();
         });
+      }
+    }
+  }
+
+  // Report pothole to the API service
+  Future<void> _reportPothole(AccelerometerData data) async {
+    try {
+      final success = await _apiService.reportPothole(
+        data: data,
+        threshold: _potholeThreshold,
+      );
+
+      if (kDebugMode) {
+        print('Pothole report ${success ? 'successful' : 'failed'}');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error reporting pothole: $e');
       }
     }
   }
