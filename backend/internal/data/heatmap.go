@@ -36,7 +36,7 @@ func (m HeatmapModel) GetByLocation(longitude float64, latitude float64) (*Heatm
 	for rows.Next() {
 		var surface Surface
 
-		err := rows.Scan(&surface.Id, &surface.Type, &surface.Latitude, &surface.Longitude)
+		err := rows.Scan(&surface.Id, &surface.Type, &surface.Longitude, &surface.Latitude)
 		if err != nil {
 			return nil, err
 		}
