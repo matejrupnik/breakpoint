@@ -19,7 +19,12 @@ class RoadSurfaceProvider with ChangeNotifier {
   final int _recentDataSize = 10; // Last 0.5 seconds (at 20Hz)
 
   StreamSubscription<AccelerometerData>? _subscription;
+  StreamSubscription<bool>? _motionSubscription;
   Timer? _reportingTimer;
+
+  // Motion state tracking
+  bool _isMoving = false;
+  bool get isMoving => _isMoving;
 
   // Road quality metrics
   double _roughnessIndex = 0.0;
@@ -79,8 +84,28 @@ class RoadSurfaceProvider with ChangeNotifier {
       _processSensorData,
     );
 
+    // Listen for motion state changes
+    _motionSubscription = _sensorService.motionStateStream.listen(
+      _handleMotionStateChange,
+    );
+
     // Start the reporting timer
     _startReporting();
+  }
+
+  void _handleMotionStateChange(bool isMoving) {
+    if (_isMoving != isMoving) {
+      _isMoving = isMoving;
+
+      if (!isMoving) {
+        // Clear data when stopped
+        _dataWindow.clear();
+        _roughnessIndex = 0.0;
+        _surfaceQuality = 'Unknown';
+      }
+
+      notifyListeners();
+    }
   }
 
   void _startReporting() {
@@ -100,7 +125,8 @@ class RoadSurfaceProvider with ChangeNotifier {
   }
 
   Future<void> _reportRoughness() async {
-    if (!_isReportingEnabled || _roughnessIndex <= 0) return;
+    // Only report when moving and roughness is significant
+    if (!_isReportingEnabled || !_isMoving || _roughnessIndex <= 0) return;
 
     try {
       final result = await _apiService.reportRoadRoughness(
@@ -118,6 +144,9 @@ class RoadSurfaceProvider with ChangeNotifier {
   }
 
   void _processSensorData(AccelerometerData data) {
+    // Only process data when the vehicle is moving
+    if (!_isMoving) return;
+
     // Add data to our window
     _dataWindow.add(data);
 
@@ -222,6 +251,7 @@ class RoadSurfaceProvider with ChangeNotifier {
   @override
   void dispose() {
     _subscription?.cancel();
+    _motionSubscription?.cancel();
     _reportingTimer?.cancel();
     super.dispose();
   }
