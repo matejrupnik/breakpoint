@@ -44,7 +44,7 @@ class PotholeApiService {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'device_fingerprint': _deviceFingerprint,
-          'surface_reading': surfaceReading,
+          'surface_reading': 6,
           'longitude': position.longitude,
           'latitude': position.latitude,
         }),
@@ -60,6 +60,50 @@ class PotholeApiService {
       return isSuccess;
     } catch (e) {
       print('Error reporting pothole: $e');
+      return false;
+    }
+  }
+
+  /// Sends road roughness data to the API
+  /// This should be called periodically (every half second)
+  Future<bool> reportRoadRoughness({required double roughnessIndex}) async {
+    try {
+      // Get current location
+      final Position? position = await _locationService.getCurrentPosition();
+
+      if (position == null) {
+        print('Error: Could not get device location');
+        return false;
+      }
+
+      // Print to console for debugging
+      print('📊 ROUGHNESS DATA: Sending data to $_baseUrl');
+      print('  - Device Fingerprint: $_deviceFingerprint');
+      print('  - Roughness Index: ${roughnessIndex.toStringAsFixed(2)}');
+      print('  - Location: ${position.latitude}, ${position.longitude}');
+
+      // Make the HTTP request with roughness index as surface_reading
+      final response = await http.post(
+        Uri.parse(_baseUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'device_fingerprint': _deviceFingerprint,
+          'surface_reading': roughnessIndex,
+          'longitude': position.longitude,
+          'latitude': position.latitude,
+        }),
+      );
+
+      final bool isSuccess =
+          response.statusCode >= 200 && response.statusCode < 300;
+
+      if (!isSuccess) {
+        print('API Error: ${response.statusCode} - ${response.body}');
+      }
+
+      return isSuccess;
+    } catch (e) {
+      print('Error reporting road roughness: $e');
       return false;
     }
   }

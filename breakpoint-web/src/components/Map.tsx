@@ -1,32 +1,86 @@
 'use client'
 
 import * as React from 'react';
-import MapGL, { Marker } from 'react-map-gl/mapbox';
+import MapGL, { Marker, Source, Layer } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { Heatmap, Pothole } from '../types/pothole';
+import { Heatmap, SurfaceReading } from '../types/pothole';
 import { getPotholes } from '../services/potholeService';
 
 interface MapProps {
   longitude?: number;
   latitude?: number;
   zoom?: number;
-    fullscreen?: boolean;
-    heatmapData?: Pothole[];
+  fullscreen?: boolean;
+  heatmapData?: Heatmap;
 }
 
 export default function Map({
-  longitude = -100,
-  latitude = 40,
-  zoom = 3.5,
-    fullscreen = true,
+  longitude = 14.50,
+  latitude = 46.05,
+  zoom = 12,
+  fullscreen = true,
   heatmapData,
 }: MapProps) {
-  const [potholes, setPotholes] = React.useState<Pothole[]>([]);
+//   const [potholes, setPotholes] = React.useState<Pothole[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [mapCenter, setMapCenter] = React.useState({ longitude, latitude });
-    const [dimensions, setDimensions] = React.useState({ width: '100vw', height: '100vh' });
+  const [dimensions, setDimensions] = React.useState({ width: '100vw', height: '100vh' });
+  
+  // Create GeoJSON line data from heatmapData
+  const asphaltLineData = React.useMemo(() => {
+    if (!heatmapData || heatmapData.asphalt.length < 2) return null;
     
-    // console.log(heatmapData)
+    return {
+      type: 'FeatureCollection' as const,
+      features: [
+        {
+          type: 'Feature' as const,
+          properties: {},
+          geometry: {
+            type: 'LineString' as const,
+            coordinates: heatmapData.asphalt.map(point => [point.longitude, point.latitude])
+          }
+        }
+      ]
+    };
+  }, [heatmapData]);
+    
+  const gravelLineData = React.useMemo(() => {
+    if (!heatmapData || heatmapData.gravel.length < 2) return null;
+    
+    return {
+      type: 'FeatureCollection' as const,
+      features: [
+        {
+          type: 'Feature' as const,
+          properties: {},
+          geometry: {
+            type: 'LineString' as const,
+            coordinates: heatmapData.gravel.map(point => [point.longitude, point.latitude])
+          }
+        }
+      ]
+    };
+  }, [heatmapData]);
+    
+  const roughLineData = React.useMemo(() => {
+    if (!heatmapData || heatmapData.rough.length < 2) return null;
+    
+    return {
+      type: 'FeatureCollection' as const,
+      features: [
+        {
+          type: 'Feature' as const,
+          properties: {},
+          geometry: {
+            type: 'LineString' as const,
+            coordinates: heatmapData.rough.map(point => [point.longitude, point.latitude])
+          }
+        }
+      ]
+    };
+  }, [heatmapData]);
+    
 
   // Effect to handle viewport size for fullscreen map
   React.useEffect(() => {
@@ -49,31 +103,6 @@ export default function Map({
       };
     }
   }, [fullscreen]);
-
-//     React.useEffect(() => {
-//     async function fetchPotholes() {
-//       try {
-//         setIsLoading(true);
-//         const data = await getPotholes();
-//         setPotholes(data);
-        
-//         // If we have pothole data, adjust the map center to the first pothole
-//         if (data.length > 0) {
-//           setMapCenter({
-//             longitude: data[0].longitude,
-//             latitude: data[0].latitude
-//           });
-//         }
-//       } catch (err) {
-//         console.error('Failed to fetch potholes:', err);
-//         setError('Failed to load pothole data. Using fallback data.');
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     }
-
-//     fetchPotholes();
-//   }, []);
 
   // Determine marker color based on severity
   const getMarkerColor = (severity?: string) => {
@@ -114,44 +143,83 @@ export default function Map({
         style={{ width: '100%', height: '100%' }}
         mapStyle="mapbox://styles/mapbox/streets-v9"
       >
-              {heatmapData?.map((pothole) => {
-                //   console.log(pothole)
-                  return (
-                      <Marker
-                          key={pothole.id}
-                          longitude={pothole.longitude}
-                          latitude={pothole.latitude}
-                      >
-                          <div className="marker-container" style={{ position: 'relative' }}>
-                              {/* Pulsating marker */}
-                              <div
-                                  className="pulsating-marker"
-                                  style={{
-                                      width: '18px',
-                                      height: '18px',
-                                      borderRadius: '50%',
-                                      backgroundColor: "rgba(255, 0, 0, 0.8)",
-                                      border: '2px solid white',
-                                      cursor: 'pointer'
-                                  }}
-                              />
+        {/* Add the lines connecting points */}
+        {asphaltLineData && (
+          <Source id="asphalt-line" type="geojson" data={asphaltLineData}>
+            <Layer
+              id="asphalt-layer"
+              type="line"
+              paint={{
+                'line-color': '#22ff00',
+                'line-width': 10,
+              }}
+            />
+          </Source>
+        )}
               
-                              {/* Tooltip that appears on hover */}
-                              <div className="marker-tooltip">
-                                  <strong>Pothole ID:</strong> {pothole.id}<br />
-                                  {/* {pothole.severity && (
+        {gravelLineData && (
+          <Source id="gravel-line" type="geojson" data={gravelLineData}>
+            <Layer
+              id="gravel-layer"
+              type="line"
+              paint={{
+                'line-color': '#f6ff00',
+                'line-width': 10,
+              }}
+            />
+          </Source>
+        )}
+              
+        {roughLineData && (
+          <Source id="rough-line" type="geojson" data={roughLineData}>
+            <Layer
+              id="rough-layer"
+              type="line"
+              paint={{
+                'line-color': '#ff4400',
+                'line-width': 10,
+              }}
+            />
+          </Source>
+        )}
+        
+        {/* Render the individual markers */}
+              {heatmapData?.pothole.map((pothole) => {
+                  console.log(pothole)
+                  return (
+          <Marker
+            key={pothole.id}
+            longitude={pothole.longitude}
+            latitude={pothole.latitude}
+          >
+            <div className="marker-container" style={{ position: 'relative' }}>
+              {/* Pulsating marker */}
+              <div
+                className="pulsating-marker"
+                style={{
+                  width: '18px',
+                  height: '18px',
+                  borderRadius: '50%',
+                  backgroundColor: "rgba(0, 123, 255, 0.8)",
+                  border: '2px solid white',
+                  cursor: 'pointer'
+                }}
+              />
+  
+              {/* Tooltip that appears on hover */}
+              <div className="marker-tooltip">
+                <strong>Pothole ID:</strong> {pothole.id}<br />
+                {/* {pothole.severity && (
                   <>
                     <strong>Severity:</strong> {pothole.severity.charAt(0).toUpperCase() + pothole.severity.slice(1)}<br />
                   </>
                 )} */}
-                                  <strong>Location:</strong> {pothole.latitude.toFixed(6)}, {pothole.longitude.toFixed(6)}
-                              </div>
-                          </div>
-                      </Marker>
-                  )
-              })}
+                <strong>Location:</strong> {pothole.latitude.toFixed(6)}, {pothole.longitude.toFixed(6)}
+              </div>
+            </div>
+          </Marker>
+        )})}
       </MapGL>
-      
     </div>
   );
 }
