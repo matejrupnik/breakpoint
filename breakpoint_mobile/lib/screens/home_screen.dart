@@ -3,11 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/accelerometer_provider.dart';
 import '../providers/road_surface_provider.dart';
 import '../services/sensor_service.dart';
-import '../widgets/accelerometer_chart.dart';
 import '../widgets/pothole_detection_banner.dart';
-import '../widgets/sensitivity_control.dart';
-import '../widgets/road_surface_indicator.dart';
-import '../widgets/road_surface_settings.dart';
 
 class HomeScreen extends StatelessWidget {
   final String title;
@@ -39,61 +35,149 @@ class HomeScreen extends StatelessWidget {
                   previous ?? RoadSurfaceProvider(sensorService),
         ),
       ],
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(title),
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        ),
-        body: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 16),
+      child: Consumer2<RoadSurfaceProvider, AccelerometerProvider>(
+        builder: (context, roadProvider, accelProvider, child) {
+          // Get background color based on road quality
+          Color backgroundColor = _getSurfaceQualityColor(
+            roadProvider.surfaceQuality,
+          );
+          bool isMoving = roadProvider.isMoving;
 
-                  // Road surface indicator at the top
-                  const RoadSurfaceIndicator(),
-
-                  // Road surface settings panel
-                  const RoadSurfaceSettings(),
-
-                  // Sensitivity control for pothole detection
-                  const SensitivityControl(),
-
-                  const SizedBox(height: 8),
-                  const Divider(),
-                  const SizedBox(height: 8),
-                  const AccelerometerChart(),
-                ],
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
+              backgroundColor: backgroundColor.withOpacity(0.8),
+              elevation: 0,
             ),
-            // Pothole detection banner that shows when a pothole is detected
-            Positioned(
-              bottom: 16,
-              left: 16,
-              right: 16,
-              child: Consumer<AccelerometerProvider>(
-                builder: (context, provider, child) {
-                  // Only show the banner when a pothole is detected
-                  if (!provider.potholeDetected) {
-                    return const SizedBox.shrink(); // Return empty widget when no pothole detected
-                  }
+            backgroundColor: backgroundColor,
+            body: Stack(
+              children: [
+                // Main content
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Movement status indicator
+                      AnimatedOpacity(
+                        opacity: isMoving ? 0.0 : 1.0,
+                        duration: const Duration(milliseconds: 500),
+                        child:
+                            !isMoving
+                                ? Container(
+                                  margin: const EdgeInsets.only(bottom: 20),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 30,
+                                    vertical: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black38,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.directions_car,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      const Text(
+                                        'Waiting for movement...',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                                : const SizedBox(),
+                      ),
 
-                  // Show the banner with an animation
-                  return AnimatedOpacity(
-                    opacity: provider.potholeDetected ? 1.0 : 0.0,
+                      // Large roughness index display
+                      Text(
+                        roadProvider.roughnessIndex.toStringAsFixed(1),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 120,
+                          fontWeight: FontWeight.bold,
+                          height: 1.0,
+                        ),
+                      ),
+
+                      // Surface quality label
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black38,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          roadProvider.surfaceQuality,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // Label for roughness index
+                      const Text(
+                        'Roughness Index',
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Pothole detection banner
+                Positioned(
+                  bottom: 16,
+                  left: 16,
+                  right: 16,
+                  child: AnimatedOpacity(
+                    opacity: accelProvider.potholeDetected ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 500),
-                    child: PotholeDetectionBanner(
-                      detectionTime: provider.lastPotholeTime,
-                    ),
-                  );
-                },
-              ),
+                    child:
+                        accelProvider.potholeDetected
+                            ? PotholeDetectionBanner(
+                              detectionTime: accelProvider.lastPotholeTime,
+                            )
+                            : const SizedBox.shrink(),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
+  }
+
+  Color _getSurfaceQualityColor(String quality) {
+    switch (quality) {
+      case 'Smooth':
+        return Colors.green;
+      case 'Moderate':
+        return Colors.yellow.shade700;
+      case 'Rough':
+        return Colors.orange;
+      case 'Very Rough':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
   }
 }

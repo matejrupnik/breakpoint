@@ -37,23 +37,15 @@ class RoadSurfaceProvider with ChangeNotifier {
   // Moving average of vertical acceleration
   double _baselineAcceleration = 0.0;
 
-  // Quality thresholds with getters and setters
-  double _smoothThreshold = 0.8;
-  double _moderateThreshold = 2.0;
-  double _roughThreshold = 4.0;
+  // Quality thresholds with getters (hard-coded to defaults)
+  final double _smoothThreshold = 0.8;
+  final double _moderateThreshold = 2.0;
+  final double _roughThreshold = 4.0;
 
+  // Getters for thresholds (no setters as values are now fixed)
   double get smoothThreshold => _smoothThreshold;
   double get moderateThreshold => _moderateThreshold;
   double get roughThreshold => _roughThreshold;
-
-  // Method to update all thresholds at once
-  void updateThresholds(double smooth, double moderate, double rough) {
-    // Ensure thresholds are in ascending order
-    _smoothThreshold = smooth;
-    _moderateThreshold = max(smooth + 0.1, moderate);
-    _roughThreshold = max(_moderateThreshold + 0.1, rough);
-    notifyListeners();
-  }
 
   // Flags to track stability
   bool _wasRecentlyStable = false;
