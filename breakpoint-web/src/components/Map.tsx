@@ -18,6 +18,9 @@ const MAP_STYLES = {
   'Outdoors': 'mapbox://styles/mapbox/outdoors-v12',
 };
 
+// Create a type for the map style keys
+type MapStyleKey = keyof typeof MAP_STYLES;
+
 interface MapProps {
   longitude?: number;
   latitude?: number;
@@ -41,7 +44,32 @@ export default function Map({
   const [heatmapData, setHeatmapData] = React.useState<Heatmap | undefined>(initialHeatmapData);
   const [isRefreshing, setIsRefreshing] = React.useState<boolean>(false);
   const [hoveredFeature, setHoveredFeature] = React.useState<SurfaceReading | null>(null);
-  const [currentMapStyle, setCurrentMapStyle] = React.useState<string>('Streets');
+  const [currentMapStyle, setCurrentMapStyle] = React.useState<MapStyleKey>('Streets');
+  // Add state for layer visibility
+  const [visibleLayers, setVisibleLayers] = React.useState({
+    asphalt: true,
+    gravel: true,
+    rough: true,
+    pothole: true
+  });
+
+  // Function to toggle visibility of a specific layer
+  const toggleLayerVisibility = (layer: keyof typeof visibleLayers) => {
+    setVisibleLayers(prev => ({
+      ...prev,
+      [layer]: !prev[layer]
+    }));
+  };
+
+  // Function to toggle all layers on/off
+  const toggleAllLayers = (visible: boolean) => {
+    setVisibleLayers({
+      asphalt: visible,
+      gravel: visible,
+      rough: visible,
+      pothole: visible
+    });
+  };
 
   // Function to fetch the latest heatmap data
   const refreshHeatmapData = React.useCallback(async () => {
@@ -239,6 +267,122 @@ export default function Map({
         </select>
       </div>
 
+      {/* Layer visibility toggles */}
+      <div style={{
+        position: 'absolute',
+        bottom: '10px',
+        left: '10px',
+        zIndex: 1000,
+        backgroundColor: 'white',
+        padding: '15px',
+        borderRadius: '4px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+        minWidth: '160px'
+      }}>
+        <div style={{ fontWeight: 'bold', marginBottom: '10px', borderBottom: '1px solid #eee', paddingBottom: '5px' }}>
+          Surface Filters
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+          <input
+            type="checkbox"
+            id="asphalt-filter"
+            checked={visibleLayers.asphalt}
+            onChange={() => toggleLayerVisibility('asphalt')}
+            style={{ marginRight: '8px' }}
+          />
+          <div style={{ 
+            width: '16px', 
+            height: '16px', 
+            backgroundColor: 'rgb(124, 207, 0)', 
+            borderRadius: '50%', 
+            marginRight: '8px' 
+          }}></div>
+          <label htmlFor="asphalt-filter">Asphalt</label>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+          <input
+            type="checkbox"
+            id="gravel-filter"
+            checked={visibleLayers.gravel}
+            onChange={() => toggleLayerVisibility('gravel')}
+            style={{ marginRight: '8px' }}
+          />
+          <div style={{ 
+            width: '16px', 
+            height: '16px', 
+            backgroundColor: 'rgb(255, 223, 32)', 
+            borderRadius: '50%', 
+            marginRight: '8px' 
+          }}></div>
+          <label htmlFor="gravel-filter">Gravel</label>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+          <input
+            type="checkbox"
+            id="rough-filter"
+            checked={visibleLayers.rough}
+            onChange={() => toggleLayerVisibility('rough')}
+            style={{ marginRight: '8px' }}
+          />
+          <div style={{ 
+            width: '16px', 
+            height: '16px', 
+            backgroundColor: 'rgb(255, 137, 4)', 
+            borderRadius: '50%', 
+            marginRight: '8px' 
+          }}></div>
+          <label htmlFor="rough-filter">Rough</label>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
+          <input
+            type="checkbox"
+            id="pothole-filter"
+            checked={visibleLayers.pothole}
+            onChange={() => toggleLayerVisibility('pothole')}
+            style={{ marginRight: '8px' }}
+          />
+          <div style={{ 
+            width: '16px', 
+            height: '16px', 
+            backgroundColor: 'rgb(251, 44, 54)', 
+            borderRadius: '50%', 
+            marginRight: '8px' 
+          }}></div>
+          <label htmlFor="pothole-filter">Pothole</label>
+        </div>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '5px' }}>
+          <button 
+            onClick={() => toggleAllLayers(true)} 
+            style={{ 
+              padding: '4px 8px', 
+              backgroundColor: '#f0f0f0', 
+              border: '1px solid #ccc', 
+              borderRadius: '3px',
+              cursor: 'pointer'
+            }}
+          >
+            Show All
+          </button>
+          <button 
+            onClick={() => toggleAllLayers(false)} 
+            style={{ 
+              padding: '4px 8px', 
+              backgroundColor: '#f0f0f0', 
+              border: '1px solid #ccc', 
+              borderRadius: '3px',
+              cursor: 'pointer'
+            }}
+          >
+            Hide All
+          </button>
+        </div>
+      </div>
+
       <MapGL
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
         initialViewState={{
@@ -288,7 +432,7 @@ export default function Map({
           />
         </Source>
 
-        {gravelData && (
+        {gravelData && visibleLayers.gravel && (
           <Source id="gravel-source" type="geojson" data={gravelData}>
             <Layer
               id="gravel-layer"
@@ -306,7 +450,7 @@ export default function Map({
           </Source>
         )}
 
-        {asphaltData && (
+        {asphaltData && visibleLayers.asphalt && (
           <Source id="asphalt-source" type="geojson" data={asphaltData}>
             <Layer
               id="asphalt-layer"
@@ -324,7 +468,7 @@ export default function Map({
           </Source>
         )}
 
-        {roughData && (
+        {roughData && visibleLayers.rough && (
           <Source id="rough-source" type="geojson" data={roughData}>
             <Layer
               id="rough-layer"
@@ -342,7 +486,7 @@ export default function Map({
           </Source>
         )}
 
-        {potholeData && (
+        {potholeData && visibleLayers.pothole && (
           <Source id="pothole-source" type="geojson" data={potholeData}>
             <Layer
               id="pothole-layer"
