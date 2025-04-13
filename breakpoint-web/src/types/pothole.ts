@@ -3,3 +3,7 @@ export interface Pothole {
   longitude: number;
   latitude: number;
 }
+
+export interface Heatmap {
+    surfaces: Pothole[];
+}

@@ -12,7 +12,7 @@ import '../widgets/road_surface_settings.dart';
 class HomeScreen extends StatelessWidget {
   final String title;
 
-  const HomeScreen({super.key, required this.title});
+  const HomeScreen({Key? key, required this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

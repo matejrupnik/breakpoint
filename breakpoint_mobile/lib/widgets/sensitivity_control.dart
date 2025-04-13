@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/accelerometer_provider.dart';
 
 class SensitivityControl extends StatelessWidget {
-  const SensitivityControl({super.key});
+  const SensitivityControl({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
