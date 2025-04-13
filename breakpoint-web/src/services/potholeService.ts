@@ -24,7 +24,8 @@ export async function getPotholes(): Promise<Pothole[]> {
     const data = await response.json();
     
     // Transform the API response to match our Pothole interface if needed
-      // This depends on the actual structure of the API response
+    // This depends on the actual structure of the API response
+    // @typescript-eslint/no-explicit-any
     const potholes: Pothole[] = data.map((item: any) => ({
       id: item.id?.toString() || Math.random().toString(36).substring(2, 11),
       latitude: item.latitude || item.lat,

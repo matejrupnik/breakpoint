@@ -31,12 +31,12 @@ class PotholeApiService {
 
       // Print to console for debugging
       print('🕳️ POTHOLE DETECTED: Sending data to $_baseUrl');
-      print('  - Device Fingerprint: $_deviceFingerprint');
-      print('  - Surface Reading: $surfaceReading');
-      print('  - Location: ${position.latitude}, ${position.longitude}');
-      print(
-        '  - Vertical acceleration: ${data.verticalAcceleration.toStringAsFixed(2)} m/s²',
-      );
+      // print('  - Device Fingerprint: $_deviceFingerprint');
+      // print('  - Surface Reading: $surfaceReading');
+      // print('  - Location: ${position.latitude}, ${position.longitude}');
+      // print(
+      //   '  - Vertical acceleration: ${data.verticalAcceleration.toStringAsFixed(2)} m/s²',
+      // );
 
       // Make the actual HTTP request
       final response = await http.post(
@@ -78,9 +78,9 @@ class PotholeApiService {
 
       // Print to console for debugging
       print('📊 ROUGHNESS DATA: Sending data to $_baseUrl');
-      print('  - Device Fingerprint: $_deviceFingerprint');
-      print('  - Roughness Index: ${roughnessIndex.toStringAsFixed(2)}');
-      print('  - Location: ${position.latitude}, ${position.longitude}');
+      // print('  - Device Fingerprint: $_deviceFingerprint');
+      // print('  - Roughness Index: ${roughnessIndex.toStringAsFixed(2)}');
+      // print('  - Location: ${position.latitude}, ${position.longitude}');
 
       // Make the HTTP request with roughness index as surface_reading
       final response = await http.post(

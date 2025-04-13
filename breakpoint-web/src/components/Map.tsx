@@ -149,16 +149,6 @@ export default function Map({
     }
   }, [fullscreen]);
 
-  // Determine marker color based on severity
-  const getMarkerColor = (severity?: string) => {
-    switch(severity) {
-      case 'high': return 'rgba(255, 0, 0, 0.8)';
-      case 'medium': return 'rgba(255, 165, 0, 0.8)';
-      case 'low': return 'rgba(255, 255, 0, 0.8)';
-      default: return 'rgba(0, 0, 255, 0.8)';
-    }
-  };
-
   return (
     <div className="map-container" style={{ position: 'relative', width: dimensions.width, height: dimensions.height }}>
       
