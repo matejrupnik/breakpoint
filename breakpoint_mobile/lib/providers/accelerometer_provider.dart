@@ -13,6 +13,11 @@ class AccelerometerProvider with ChangeNotifier {
       ListQueue<AccelerometerData>();
 
   StreamSubscription<AccelerometerData>? _subscription;
+  StreamSubscription<bool>? _motionSubscription;
+
+  // Motion state tracking
+  bool _isMoving = false;
+  bool get isMoving => _isMoving;
 
   // Pothole detection threshold (in m/s²)
   // Significant vertical acceleration change indicates a pothole
@@ -56,6 +61,26 @@ class AccelerometerProvider with ChangeNotifier {
     _subscription = _sensorService.accelerometerStream.listen(
       _handleSensorData,
     );
+
+    // Subscribe to motion state changes
+    _motionSubscription = _sensorService.motionStateStream.listen(
+      _handleMotionStateChange,
+    );
+  }
+
+  void _handleMotionStateChange(bool isMoving) {
+    if (_isMoving != isMoving) {
+      _isMoving = isMoving;
+
+      if (isMoving) {
+        // Clear old data when starting movement
+        _dataPoints.clear();
+        _minVertical = -10.0;
+        _maxVertical = 10.0;
+      }
+
+      notifyListeners();
+    }
   }
 
   void _handleSensorData(AccelerometerData data) {
@@ -68,12 +93,10 @@ class AccelerometerProvider with ChangeNotifier {
     }
 
     // Update min/max vertical values for chart scaling
-    if (data.verticalAcceleration < _minVertical) {
+    if (data.verticalAcceleration < _minVertical)
       _minVertical = data.verticalAcceleration;
-    }
-    if (data.verticalAcceleration > _maxVertical) {
+    if (data.verticalAcceleration > _maxVertical)
       _maxVertical = data.verticalAcceleration;
-    }
 
     // Check for pothole based on vertical acceleration
     _checkForPothole(data);
@@ -140,6 +163,7 @@ class AccelerometerProvider with ChangeNotifier {
   @override
   void dispose() {
     _subscription?.cancel();
+    _motionSubscription?.cancel();
     _sensorService.dispose();
     super.dispose();
   }

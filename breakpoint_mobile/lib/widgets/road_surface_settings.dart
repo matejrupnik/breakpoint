@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/road_surface_provider.dart';
 
 class RoadSurfaceSettings extends StatefulWidget {
-  const RoadSurfaceSettings({super.key});
+  const RoadSurfaceSettings({Key? key}) : super(key: key);
 
   @override
   State<RoadSurfaceSettings> createState() => _RoadSurfaceSettingsState();

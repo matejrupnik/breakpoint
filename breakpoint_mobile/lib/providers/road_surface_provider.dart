@@ -4,9 +4,11 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import '../models/accelerometer_data.dart';
 import '../services/sensor_service.dart';
+import '../services/pothole_api_service.dart';
 
 class RoadSurfaceProvider with ChangeNotifier {
   final SensorService _sensorService;
+  final PotholeApiService _apiService = PotholeApiService();
 
   // Store 2 seconds of data at 20Hz sampling rate (40 samples)
   final int _windowSize = 40;
@@ -17,6 +19,12 @@ class RoadSurfaceProvider with ChangeNotifier {
   final int _recentDataSize = 10; // Last 0.5 seconds (at 20Hz)
 
   StreamSubscription<AccelerometerData>? _subscription;
+  StreamSubscription<bool>? _motionSubscription;
+  Timer? _reportingTimer;
+
+  // Motion state tracking
+  bool _isMoving = false;
+  bool get isMoving => _isMoving;
 
   // Road quality metrics
   double _roughnessIndex = 0.0;
@@ -51,6 +59,21 @@ class RoadSurfaceProvider with ChangeNotifier {
   bool _wasRecentlyStable = false;
   int _stableCounter = 0;
 
+  // Reporting configuration
+  bool _isReportingEnabled = true;
+  bool get isReportingEnabled => _isReportingEnabled;
+  set isReportingEnabled(bool value) {
+    if (_isReportingEnabled != value) {
+      _isReportingEnabled = value;
+      if (_isReportingEnabled) {
+        _startReporting();
+      } else {
+        _stopReporting();
+      }
+      notifyListeners();
+    }
+  }
+
   RoadSurfaceProvider(this._sensorService) {
     _initialize();
   }
@@ -60,9 +83,70 @@ class RoadSurfaceProvider with ChangeNotifier {
     _subscription = _sensorService.accelerometerStream.listen(
       _processSensorData,
     );
+
+    // Listen for motion state changes
+    _motionSubscription = _sensorService.motionStateStream.listen(
+      _handleMotionStateChange,
+    );
+
+    // Start the reporting timer
+    _startReporting();
+  }
+
+  void _handleMotionStateChange(bool isMoving) {
+    if (_isMoving != isMoving) {
+      _isMoving = isMoving;
+
+      if (!isMoving) {
+        // Clear data when stopped
+        _dataWindow.clear();
+        _roughnessIndex = 0.0;
+        _surfaceQuality = 'Unknown';
+      }
+
+      notifyListeners();
+    }
+  }
+
+  void _startReporting() {
+    // Cancel any existing timer
+    _reportingTimer?.cancel();
+
+    // Create a new timer that fires every 500ms (half second)
+    _reportingTimer = Timer.periodic(
+      const Duration(milliseconds: 500),
+      (_) => _reportRoughness(),
+    );
+  }
+
+  void _stopReporting() {
+    _reportingTimer?.cancel();
+    _reportingTimer = null;
+  }
+
+  Future<void> _reportRoughness() async {
+    // Only report when moving and roughness is significant
+    if (!_isReportingEnabled || !_isMoving || _roughnessIndex <= 0) return;
+
+    try {
+      final result = await _apiService.reportRoadRoughness(
+        roughnessIndex: _roughnessIndex,
+      );
+
+      if (kDebugMode && result) {
+        print('Successfully reported roughness: $_roughnessIndex');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error reporting roughness: $e');
+      }
+    }
   }
 
   void _processSensorData(AccelerometerData data) {
+    // Only process data when the vehicle is moving
+    if (!_isMoving) return;
+
     // Add data to our window
     _dataWindow.add(data);
 
@@ -167,6 +251,8 @@ class RoadSurfaceProvider with ChangeNotifier {
   @override
   void dispose() {
     _subscription?.cancel();
+    _motionSubscription?.cancel();
+    _reportingTimer?.cancel();
     super.dispose();
   }
 }

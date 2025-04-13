@@ -4,7 +4,8 @@ import 'package:intl/intl.dart';
 class PotholeDetectionBanner extends StatelessWidget {
   final DateTime? detectionTime;
 
-  const PotholeDetectionBanner({super.key, required this.detectionTime});
+  const PotholeDetectionBanner({Key? key, required this.detectionTime})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
