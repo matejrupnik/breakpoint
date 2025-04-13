@@ -244,22 +244,51 @@ export default function Map({
         </div>
       )}
 
-      {/* Map style switcher */}
+      {/* Map style switcher - modern design */}
       <div style={{
         position: 'absolute',
-        top: '10px',
-        right: '10px',
+        top: '20px',
+        right: '20px',
         zIndex: 1000,
-        backgroundColor: 'white',
-        padding: '10px',
-        borderRadius: '4px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        padding: '15px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        backdropFilter: 'blur(5px)',
+        fontFamily: 'system-ui, -apple-system, sans-serif'
       }}>
-        <label htmlFor="map-style-select" style={{ marginRight: '10px' }}>Map Style:</label>
+        <div style={{ 
+          fontWeight: '600', 
+          marginBottom: '12px', 
+          borderBottom: '1px solid rgba(0,0,0,0.1)', 
+          paddingBottom: '8px',
+          fontSize: '14px',
+          color: '#333'
+        }}>
+          MAP STYLE
+        </div>
         <select
           id="map-style-select"
           value={currentMapStyle}
-          onChange={(e) => setCurrentMapStyle(e.target.value)}
+          onChange={(e) => setCurrentMapStyle(e.target.value as MapStyleKey)}
+          style={{
+            width: '100%',
+            padding: '8px 10px',
+            borderRadius: '6px',
+            border: '1px solid rgba(0,0,0,0.1)',
+            backgroundColor: '#f8f8f8',
+            fontSize: '13px',
+            color: '#333',
+            cursor: 'pointer',
+            outline: 'none',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+            appearance: 'none',
+            backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 10px top 50%',
+            backgroundSize: '12px auto',
+            paddingRight: '28px'
+          }}
         >
           {Object.keys(MAP_STYLES).map(style => (
             <option key={style} value={style}>{style}</option>
@@ -267,115 +296,243 @@ export default function Map({
         </select>
       </div>
 
-      {/* Layer visibility toggles */}
+      {/* Layer visibility toggles - modern sleek design */}
       <div style={{
         position: 'absolute',
-        bottom: '10px',
-        left: '10px',
+        bottom: '20px',
+        left: '20px',
         zIndex: 1000,
-        backgroundColor: 'white',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
         padding: '15px',
-        borderRadius: '4px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-        minWidth: '160px'
+        borderRadius: '8px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        backdropFilter: 'blur(5px)',
+        minWidth: '180px',
+        fontFamily: 'system-ui, -apple-system, sans-serif'
       }}>
-        <div style={{ fontWeight: 'bold', marginBottom: '10px', borderBottom: '1px solid #eee', paddingBottom: '5px' }}>
-          Surface Filters
+        <div style={{ 
+          fontWeight: '600', 
+          marginBottom: '12px', 
+          borderBottom: '1px solid rgba(0,0,0,0.1)', 
+          paddingBottom: '8px',
+          fontSize: '14px',
+          color: '#333'
+        }}>
+          SURFACE TYPES
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-          <input
-            type="checkbox"
-            id="asphalt-filter"
-            checked={visibleLayers.asphalt}
-            onChange={() => toggleLayerVisibility('asphalt')}
-            style={{ marginRight: '8px' }}
-          />
-          <div style={{ 
-            width: '16px', 
-            height: '16px', 
-            backgroundColor: 'rgb(124, 207, 0)', 
-            borderRadius: '50%', 
-            marginRight: '8px' 
-          }}></div>
-          <label htmlFor="asphalt-filter">Smooth</label>
+        {/* Asphalt Toggle */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          marginBottom: '10px',
+          cursor: 'pointer'
+        }} onClick={() => toggleLayerVisibility('asphalt')}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ 
+              width: '12px', 
+              height: '12px', 
+              backgroundColor: 'rgb(124, 207, 0)', 
+              borderRadius: '50%', 
+              marginRight: '10px',
+              border: '2px solid white',
+              boxShadow: '0 0 0 1px rgba(0,0,0,0.1)'
+            }}></div>
+            <span style={{ fontSize: '13px', color: '#333' }}>Asphalt</span>
+          </div>
+          <div style={{
+            width: '36px',
+            height: '20px',
+            backgroundColor: visibleLayers.asphalt ? 'rgb(124, 207, 0)' : '#e0e0e0',
+            borderRadius: '10px',
+            position: 'relative',
+            transition: 'background-color 0.2s',
+          }}>
+            <div style={{
+              width: '16px',
+              height: '16px',
+              backgroundColor: 'white',
+              borderRadius: '50%',
+              position: 'absolute',
+              top: '2px',
+              left: visibleLayers.asphalt ? '18px' : '2px',
+              transition: 'left 0.2s',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.3)'
+            }}></div>
+          </div>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-          <input
-            type="checkbox"
-            id="gravel-filter"
-            checked={visibleLayers.gravel}
-            onChange={() => toggleLayerVisibility('gravel')}
-            style={{ marginRight: '8px' }}
-          />
-          <div style={{ 
-            width: '16px', 
-            height: '16px', 
-            backgroundColor: 'rgb(255, 223, 32)', 
-            borderRadius: '50%', 
-            marginRight: '8px' 
-          }}></div>
-          <label htmlFor="gravel-filter">Moderate</label>
+        {/* Gravel Toggle */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          marginBottom: '10px',
+          cursor: 'pointer'
+        }} onClick={() => toggleLayerVisibility('gravel')}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ 
+              width: '12px', 
+              height: '12px', 
+              backgroundColor: 'rgb(255, 223, 32)', 
+              borderRadius: '50%', 
+              marginRight: '10px',
+              border: '2px solid white',
+              boxShadow: '0 0 0 1px rgba(0,0,0,0.1)'
+            }}></div>
+            <span style={{ fontSize: '13px', color: '#333' }}>Gravel</span>
+          </div>
+          <div style={{
+            width: '36px',
+            height: '20px',
+            backgroundColor: visibleLayers.gravel ? 'rgb(255, 223, 32)' : '#e0e0e0',
+            borderRadius: '10px',
+            position: 'relative',
+            transition: 'background-color 0.2s',
+          }}>
+            <div style={{
+              width: '16px',
+              height: '16px',
+              backgroundColor: 'white',
+              borderRadius: '50%',
+              position: 'absolute',
+              top: '2px',
+              left: visibleLayers.gravel ? '18px' : '2px',
+              transition: 'left 0.2s',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.3)'
+            }}></div>
+          </div>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-          <input
-            type="checkbox"
-            id="rough-filter"
-            checked={visibleLayers.rough}
-            onChange={() => toggleLayerVisibility('rough')}
-            style={{ marginRight: '8px' }}
-          />
-          <div style={{ 
-            width: '16px', 
-            height: '16px', 
-            backgroundColor: 'rgb(255, 137, 4)', 
-            borderRadius: '50%', 
-            marginRight: '8px' 
-          }}></div>
-          <label htmlFor="rough-filter">Rough</label>
+        {/* Rough Toggle */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          marginBottom: '10px',
+          cursor: 'pointer'
+        }} onClick={() => toggleLayerVisibility('rough')}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ 
+              width: '12px', 
+              height: '12px', 
+              backgroundColor: 'rgb(255, 137, 4)', 
+              borderRadius: '50%', 
+              marginRight: '10px',
+              border: '2px solid white',
+              boxShadow: '0 0 0 1px rgba(0,0,0,0.1)'
+            }}></div>
+            <span style={{ fontSize: '13px', color: '#333' }}>Rough</span>
+          </div>
+          <div style={{
+            width: '36px',
+            height: '20px',
+            backgroundColor: visibleLayers.rough ? 'rgb(255, 137, 4)' : '#e0e0e0',
+            borderRadius: '10px',
+            position: 'relative',
+            transition: 'background-color 0.2s',
+          }}>
+            <div style={{
+              width: '16px',
+              height: '16px',
+              backgroundColor: 'white',
+              borderRadius: '50%',
+              position: 'absolute',
+              top: '2px',
+              left: visibleLayers.rough ? '18px' : '2px',
+              transition: 'left 0.2s',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.3)'
+            }}></div>
+          </div>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
-          <input
-            type="checkbox"
-            id="pothole-filter"
-            checked={visibleLayers.pothole}
-            onChange={() => toggleLayerVisibility('pothole')}
-            style={{ marginRight: '8px' }}
-          />
-          <div style={{ 
-            width: '16px', 
-            height: '16px', 
-            backgroundColor: 'rgb(251, 44, 54)', 
-            borderRadius: '50%', 
-            marginRight: '8px' 
-          }}></div>
-          <label htmlFor="pothole-filter">Pothole</label>
+        {/* Pothole Toggle */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          marginBottom: '15px',
+          cursor: 'pointer'
+        }} onClick={() => toggleLayerVisibility('pothole')}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ 
+              width: '12px', 
+              height: '12px', 
+              backgroundColor: 'rgb(251, 44, 54)', 
+              borderRadius: '50%', 
+              marginRight: '10px',
+              border: '2px solid white',
+              boxShadow: '0 0 0 1px rgba(0,0,0,0.1)'
+            }}></div>
+            <span style={{ fontSize: '13px', color: '#333' }}>Pothole</span>
+          </div>
+          <div style={{
+            width: '36px',
+            height: '20px',
+            backgroundColor: visibleLayers.pothole ? 'rgb(251, 44, 54)' : '#e0e0e0',
+            borderRadius: '10px',
+            position: 'relative',
+            transition: 'background-color 0.2s',
+          }}>
+            <div style={{
+              width: '16px',
+              height: '16px',
+              backgroundColor: 'white',
+              borderRadius: '50%',
+              position: 'absolute',
+              top: '2px',
+              left: visibleLayers.pothole ? '18px' : '2px',
+              transition: 'left 0.2s',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.3)'
+            }}></div>
+          </div>
         </div>
         
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '5px' }}>
+        {/* Toggle All Buttons */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          marginTop: '8px',
+          borderTop: '1px solid rgba(0,0,0,0.1)',
+          paddingTop: '12px'
+        }}>
           <button 
-            onClick={() => toggleAllLayers(true)} 
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleAllLayers(true);
+            }} 
             style={{ 
-              padding: '4px 8px', 
-              backgroundColor: '#f0f0f0', 
-              border: '1px solid #ccc', 
-              borderRadius: '3px',
-              cursor: 'pointer'
+              padding: '6px 12px', 
+              backgroundColor: '#f8f8f8', 
+              border: 'none', 
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: '500',
+              color: '#333',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              transition: 'all 0.2s'
             }}
           >
             Show All
           </button>
           <button 
-            onClick={() => toggleAllLayers(false)} 
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleAllLayers(false);
+            }} 
             style={{ 
-              padding: '4px 8px', 
-              backgroundColor: '#f0f0f0', 
-              border: '1px solid #ccc', 
-              borderRadius: '3px',
-              cursor: 'pointer'
+              padding: '6px 12px', 
+              backgroundColor: '#f8f8f8', 
+              border: 'none', 
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: '500',
+              color: '#333',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              transition: 'all 0.2s'
             }}
           >
             Hide All
