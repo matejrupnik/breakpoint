@@ -6,6 +6,18 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Heatmap, SurfaceReading } from '../types/pothole';
 import { getHeatmap } from '../api/getHeatmap';
 
+// Define available map styles
+const MAP_STYLES = {
+  'Streets': 'mapbox://styles/mapbox/streets-v11',
+  'Light': 'mapbox://styles/mapbox/light-v11',
+  'Dark': 'mapbox://styles/mapbox/dark-v11',
+  'Satellite': 'mapbox://styles/mapbox/satellite-v9',
+  'Satellite Streets': 'mapbox://styles/mapbox/satellite-streets-v12',
+  'Navigation Day': 'mapbox://styles/mapbox/navigation-day-v1',
+  'Navigation Night': 'mapbox://styles/mapbox/navigation-night-v1',
+  'Outdoors': 'mapbox://styles/mapbox/outdoors-v12',
+};
+
 interface MapProps {
   longitude?: number;
   latitude?: number;
@@ -29,6 +41,7 @@ export default function Map({
   const [heatmapData, setHeatmapData] = React.useState<Heatmap | undefined>(initialHeatmapData);
   const [isRefreshing, setIsRefreshing] = React.useState<boolean>(false);
   const [hoveredFeature, setHoveredFeature] = React.useState<SurfaceReading | null>(null);
+  const [currentMapStyle, setCurrentMapStyle] = React.useState<string>('Streets');
 
   // Function to fetch the latest heatmap data
   const refreshHeatmapData = React.useCallback(async () => {
@@ -203,6 +216,29 @@ export default function Map({
         </div>
       )}
 
+      {/* Map style switcher */}
+      <div style={{
+        position: 'absolute',
+        top: '10px',
+        right: '10px',
+        zIndex: 1000,
+        backgroundColor: 'white',
+        padding: '10px',
+        borderRadius: '4px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+      }}>
+        <label htmlFor="map-style-select" style={{ marginRight: '10px' }}>Map Style:</label>
+        <select
+          id="map-style-select"
+          value={currentMapStyle}
+          onChange={(e) => setCurrentMapStyle(e.target.value)}
+        >
+          {Object.keys(MAP_STYLES).map(style => (
+            <option key={style} value={style}>{style}</option>
+          ))}
+        </select>
+      </div>
+
       <MapGL
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
         initialViewState={{
@@ -213,7 +249,7 @@ export default function Map({
           bearing: 0
         }}
         style={{ width: '100%', height: '100%' }}
-        mapStyle="mapbox://styles/mapbox/streets-v11" // Using a more detailed style
+        mapStyle={MAP_STYLES[currentMapStyle]} // Use selected map style
         terrain={{ source: 'mapbox-dem', exaggeration: 1.5 }} // Add terrain
         interactiveLayerIds={[
           'pothole-layer' // Only pothole layer is interactive now
@@ -264,10 +300,7 @@ export default function Map({
                   15, 5,
                   20, 8
                 ],
-                'circle-color': 'rgba(255, 238, 0, 0.8)',
-                'circle-stroke-width': 1,
-                'circle-stroke-color': '#ffffff',
-                'circle-stroke-opacity': 0.8
+                'circle-color': 'rgb(255, 223, 32)',
               }}
             />
           </Source>
@@ -285,10 +318,7 @@ export default function Map({
                   15, 5,
                   20, 8
                 ],
-                'circle-color': 'rgba(0, 255, 21, 0.8)',
-                // 'circle-stroke-width': 1,
-                // 'circle-stroke-color': '#ffffff',
-                // 'circle-stroke-opacity': 0.8
+                'circle-color': 'rgb(124, 207, 0)',
               }}
             />
           </Source>
@@ -306,10 +336,7 @@ export default function Map({
                   15, 6,
                   20, 9
                 ],
-                'circle-color': 'rgba(255, 106, 0, 0.8)',
-                // 'circle-stroke-width': 1,
-                // 'circle-stroke-color': '#ffffff',
-                // 'circle-stroke-opacity': 0.8
+                'circle-color': 'rgb(255, 137, 4)',
               }}
             />
           </Source>
@@ -327,11 +354,7 @@ export default function Map({
                   15, 16,
                   20, 25
                 ],
-                'circle-color': 'rgba(226, 0, 0, 0.8)',
-                // 'circle-stroke-width': 2,
-                // 'circle-stroke-color': '#ffffff',
-                // 'circle-stroke-opacity': 1,
-                // Add 3D-like effect with shadows
+                'circle-color': 'rgb(251, 44, 54)',
                 'circle-translate': [0, 0],
                 'circle-translate-anchor': 'viewport',
                 'circle-pitch-alignment': 'map',
@@ -378,7 +401,6 @@ export default function Map({
               transform: 'translate(-50%, -100%)',
               marginBottom: '10px'
             }}>
-              <strong>ID:</strong> {hoveredFeature.id}<br />
               <strong>Location:</strong> {hoveredFeature.latitude.toFixed(6)}, {hoveredFeature.longitude.toFixed(6)}
             </div>
           </Marker>
