@@ -298,7 +298,7 @@ export default function Map({
             borderRadius: '50%', 
             marginRight: '8px' 
           }}></div>
-          <label htmlFor="asphalt-filter">Asphalt</label>
+          <label htmlFor="asphalt-filter">Smooth</label>
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
@@ -316,7 +316,7 @@ export default function Map({
             borderRadius: '50%', 
             marginRight: '8px' 
           }}></div>
-          <label htmlFor="gravel-filter">Gravel</label>
+          <label htmlFor="gravel-filter">Moderate</label>
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
