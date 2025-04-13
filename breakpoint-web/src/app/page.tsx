@@ -6,8 +6,6 @@ export default async function Home() {
 
   const heatmapData = await getHeatmap();
 
-  // console.log(heatmapData);
-
   return (
     <main className="w-screen h-screen overflow-hidden">
       <Map heatmapData={heatmapData} />

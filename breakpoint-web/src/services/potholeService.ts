@@ -1,7 +1,7 @@
 import { Pothole } from '../types/pothole';
 
 // API endpoint for pothole data
-const API_ENDPOINT = 'http://165.232.115.82:4000/api/heatmap';
+const API_ENDPOINT = '/api/heatmap';
 
 // Mock data as fallback
 const MOCK_POTHOLES: Pothole[] = [

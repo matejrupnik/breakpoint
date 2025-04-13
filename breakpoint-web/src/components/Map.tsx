@@ -4,7 +4,7 @@ import * as React from 'react';
 import MapGL, { Marker, Source, Layer } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Heatmap, SurfaceReading } from '../types/pothole';
-import { getPotholes } from '../services/potholeService';
+import { getHeatmap } from '../api/getHeatmap';
 
 interface MapProps {
   longitude?: number;
@@ -12,6 +12,7 @@ interface MapProps {
   zoom?: number;
   fullscreen?: boolean;
   heatmapData?: Heatmap;
+  refreshInterval?: number; // Added refresh interval prop in seconds
 }
 
 export default function Map({
@@ -19,12 +20,56 @@ export default function Map({
   latitude = 46.05,
   zoom = 12,
   fullscreen = true,
-  heatmapData,
+  heatmapData: initialHeatmapData,
+  refreshInterval = 5, // Default to 10 seconds
 }: MapProps) {
-//   const [potholes, setPotholes] = React.useState<Pothole[]>([]);
   const [error, setError] = React.useState<string | null>(null);
   const [mapCenter, setMapCenter] = React.useState({ longitude, latitude });
   const [dimensions, setDimensions] = React.useState({ width: '100vw', height: '100vh' });
+  const [heatmapData, setHeatmapData] = React.useState<Heatmap | undefined>(initialHeatmapData);
+  const [isRefreshing, setIsRefreshing] = React.useState<boolean>(false);
+  
+  // Function to fetch the latest heatmap data
+  const refreshHeatmapData = React.useCallback(async () => {
+    
+    try {
+      setIsRefreshing(true);
+      // Use the existing getHeatmap function from our API
+      const newData = await getHeatmap();
+      setHeatmapData(newData);
+      setError(null);
+    } catch (err) {
+      console.error('Error refreshing heatmap data:', err);
+      setError('Failed to refresh map data. Will try again.');
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, []);
+
+  // Set up the periodic refresh
+  React.useEffect(() => {
+    // Skip if no refresh is desired or no initial data
+    if (refreshInterval <= 0) return;
+    
+    console.log(`Setting up refresh interval: ${refreshInterval} seconds`);
+    
+    // Initial load if no heatmapData was provided
+    if (!initialHeatmapData && !isRefreshing) {
+      refreshHeatmapData();
+    }
+    
+    // Set up interval for periodic updates
+    const intervalId = setInterval(() => {
+      console.log('Refreshing heatmap data...');
+      refreshHeatmapData();
+    }, refreshInterval * 1000);
+    
+    // Clean up interval on component unmount
+    return () => {
+      console.log('Cleaning up refresh interval');
+      clearInterval(intervalId);
+    };
+  }, [refreshInterval, refreshHeatmapData, initialHeatmapData, isRefreshing]);
   
   // Create GeoJSON line data from heatmapData
   const asphaltLineData = React.useMemo(() => {
@@ -144,7 +189,7 @@ export default function Map({
         mapStyle="mapbox://styles/mapbox/streets-v9"
       >
         {/* Add the lines connecting points */}
-        {asphaltLineData && (
+        {/* {asphaltLineData && (
           <Source id="asphalt-line" type="geojson" data={asphaltLineData}>
             <Layer
               id="asphalt-layer"
@@ -181,11 +226,10 @@ export default function Map({
               }}
             />
           </Source>
-        )}
+        )} */}
         
         {/* Render the individual markers */}
               {heatmapData?.pothole.map((pothole) => {
-                  console.log(pothole)
                   return (
           <Marker
             key={pothole.id}
@@ -197,11 +241,116 @@ export default function Map({
               <div
                 className="pulsating-marker"
                 style={{
-                  width: '18px',
-                  height: '18px',
+                  width: '32px',
+                  height: '32px',
                   borderRadius: '50%',
-                  backgroundColor: "rgba(0, 123, 255, 0.8)",
+                  backgroundColor: "rgba(183, 0, 0, 0.8)",
                   border: '2px solid white',
+                  cursor: 'pointer'
+                }}
+              />
+  
+              {/* Tooltip that appears on hover */}
+              <div className="marker-tooltip">
+                <strong>Pothole ID:</strong> {pothole.id}<br />
+                {/* {pothole.severity && (
+                  <>
+                    <strong>Severity:</strong> {pothole.severity.charAt(0).toUpperCase() + pothole.severity.slice(1)}<br />
+                  </>
+                )} */}
+                <strong>Location:</strong> {pothole.latitude.toFixed(6)}, {pothole.longitude.toFixed(6)}
+              </div>
+            </div>
+          </Marker>
+                )
+              })}
+        {heatmapData?.asphalt.map((pothole) => {
+                  return (
+          <Marker
+            key={pothole.id}
+            longitude={pothole.longitude}
+            latitude={pothole.latitude}
+          >
+            <div className="marker-container" style={{ position: 'relative' }}>
+              {/* Pulsating marker */}
+              <div
+                className="pulsating-marker"
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  backgroundColor: "rgba(0, 255, 21, 0.8)",
+                  // border: '2px solid white',
+                  cursor: 'pointer'
+                }}
+              />
+  
+              {/* Tooltip that appears on hover */}
+              <div className="marker-tooltip">
+                <strong>Pothole ID:</strong> {pothole.id}<br />
+                {/* {pothole.severity && (
+                  <>
+                    <strong>Severity:</strong> {pothole.severity.charAt(0).toUpperCase() + pothole.severity.slice(1)}<br />
+                  </>
+                )} */}
+                <strong>Location:</strong> {pothole.latitude.toFixed(6)}, {pothole.longitude.toFixed(6)}
+              </div>
+            </div>
+          </Marker>
+          )
+        })}
+        {heatmapData?.gravel.map((pothole) => {
+                  return (
+          <Marker
+            key={pothole.id}
+            longitude={pothole.longitude}
+            latitude={pothole.latitude}
+          >
+            <div className="marker-container" style={{ position: 'relative' }}>
+              {/* Pulsating marker */}
+              <div
+                className="pulsating-marker"
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  backgroundColor: "rgba(255, 238, 0, 0.8)",
+                  // border: '2px solid white',
+                  cursor: 'pointer'
+                }}
+              />
+  
+              {/* Tooltip that appears on hover */}
+              <div className="marker-tooltip">
+                <strong>Pothole ID:</strong> {pothole.id}<br />
+                {/* {pothole.severity && (
+                  <>
+                    <strong>Severity:</strong> {pothole.severity.charAt(0).toUpperCase() + pothole.severity.slice(1)}<br />
+                  </>
+                )} */}
+                <strong>Location:</strong> {pothole.latitude.toFixed(6)}, {pothole.longitude.toFixed(6)}
+              </div>
+            </div>
+          </Marker>
+          )
+        })}
+        {heatmapData?.rough.map((pothole) => {
+                  return (
+          <Marker
+            key={pothole.id}
+            longitude={pothole.longitude}
+            latitude={pothole.latitude}
+          >
+            <div className="marker-container" style={{ position: 'relative' }}>
+              {/* Pulsating marker */}
+              <div
+                className="pulsating-marker"
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  backgroundColor: "rgba(255, 106, 0, 0.8)",
+                  // border: '2px solid white',
                   cursor: 'pointer'
                 }}
               />
