@@ -57,17 +57,13 @@ class AccelerometerChart extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.sensors,
-                  size: 48,
-                  color: Colors.green,
-                ),
+                const Icon(Icons.sensors, size: 48, color: Colors.green),
                 const SizedBox(height: 16),
                 Text(
                   'Pothole Detection Active',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: Colors.green,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(color: Colors.green),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
