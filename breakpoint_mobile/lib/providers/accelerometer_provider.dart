@@ -21,14 +21,11 @@ class AccelerometerProvider with ChangeNotifier {
 
   // Pothole detection threshold (in m/s²)
   // Significant vertical acceleration change indicates a pothole
-  double _potholeThreshold = 5.0;
+  // Hard-coded to 3.5 as requested
+  final double _potholeThreshold = 3.5;
 
-  // Getter and setter for pothole threshold
+  // Getter for pothole threshold (setter removed as value is now fixed)
   double get potholeThreshold => _potholeThreshold;
-  set potholeThreshold(double value) {
-    _potholeThreshold = value;
-    notifyListeners();
-  }
 
   // Flag to track if a pothole was detected
   bool _potholeDetected = false;

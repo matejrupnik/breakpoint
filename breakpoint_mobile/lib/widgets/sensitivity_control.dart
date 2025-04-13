@@ -23,23 +23,26 @@ class SensitivityControl extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: const [
-                    Text('High Sensitivity'),
-                    Spacer(),
-                    Text('Low Sensitivity'),
-                  ],
-                ),
-                Slider(
-                  value: provider.potholeThreshold,
-                  min: 1.0,
-                  max: 10.0,
-                  divisions: 18,
-                  label: provider.potholeThreshold.toStringAsFixed(1),
-                  onChanged: (value) {
-                    provider.potholeThreshold = value;
-                  },
+                const SizedBox(height: 16),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.blue),
+                    ),
+                    child: Text(
+                      'Current sensitivity: ${provider.potholeThreshold.toStringAsFixed(1)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
