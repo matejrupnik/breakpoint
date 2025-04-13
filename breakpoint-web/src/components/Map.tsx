@@ -178,45 +178,6 @@ export default function Map({
         style={{ width: '100%', height: '100%' }}
         mapStyle="mapbox://styles/mapbox/streets-v9"
       >
-        {/* Add the lines connecting points */}
-        {/* {asphaltLineData && (
-          <Source id="asphalt-line" type="geojson" data={asphaltLineData}>
-            <Layer
-              id="asphalt-layer"
-              type="line"
-              paint={{
-                'line-color': '#22ff00',
-                'line-width': 10,
-              }}
-            />
-          </Source>
-        )}
-              
-        {gravelLineData && (
-          <Source id="gravel-line" type="geojson" data={gravelLineData}>
-            <Layer
-              id="gravel-layer"
-              type="line"
-              paint={{
-                'line-color': '#f6ff00',
-                'line-width': 10,
-              }}
-            />
-          </Source>
-        )}
-              
-        {roughLineData && (
-          <Source id="rough-line" type="geojson" data={roughLineData}>
-            <Layer
-              id="rough-layer"
-              type="line"
-              paint={{
-                'line-color': '#ff4400',
-                'line-width': 10,
-              }}
-            />
-          </Source>
-        )} */}
         
         {/* Render the individual markers */}
               {heatmapData?.pothole.map((pothole) => {
@@ -229,7 +190,7 @@ export default function Map({
             <div className="marker-container" style={{ position: 'relative' }}>
               {/* Pulsating marker */}
               <div
-                className="pulsating-marker"
+                // className="pulsating-marker"
                 style={{
                   width: '32px',
                   height: '32px',
