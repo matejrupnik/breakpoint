@@ -35,6 +35,8 @@ func (app *application) createSurfaceReadingHandler(w http.ResponseWriter, r *ht
 		return
 	}
 
+	log.Println(surfaceReading)
+
 	jsonResponse, err := json.MarshalIndent(map[string]any{"surface_reading": surfaceReading}, "", "\t")
 	if err != nil {
 		log.Println(err)
