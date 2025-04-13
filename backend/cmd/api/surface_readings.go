@@ -46,6 +46,8 @@ func (app *application) createSurfaceReadingHandler(w http.ResponseWriter, r *ht
 	jsonResponse = append(jsonResponse, '\n')
 
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 	_, err = w.Write(jsonResponse)
 	if err != nil {
