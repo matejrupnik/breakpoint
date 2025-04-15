@@ -45,7 +45,7 @@ In essence, Breakpoint combines real-time driver awareness with crowdsourced inf
 
 ---
 
-## 💻 Technology Stack (Example)
+## 💻 Technology Stack
 
 * **Mobile App:** Flutter
 * **Backend:** Golang
