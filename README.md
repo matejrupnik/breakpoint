@@ -38,7 +38,7 @@ In essence, Breakpoint combines real-time driver awareness with crowdsourced inf
 ![Group 7](https://github.com/user-attachments/assets/e2bdbcb2-190c-41d9-bd1e-fe6b35b50723)
 
 **Mobile Application:** The data collection interface on the smartphone.
-![Rectangle 1](https://github.com/user-attachments/assets/ebc96e73-b364-45cc-b943-3e6c975b368d)
+![Group 6](https://github.com/user-attachments/assets/e92ec440-bc7e-42be-9ac0-3e96633b8aed)
 
 **System Architecture:** Overview of the data flow.
 ![arch.png](arch.png)
