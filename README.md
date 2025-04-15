@@ -1,12 +1,54 @@
-### BREAKPOINT
+# 🚗 Breakpoint: Road Quality & Pothole Detection System
 
-![web.png](web.png)
+**Passively detect potholes and map road quality using your smartphone's accelerometer.**
 
-![app.png](app.png)
+---
 
+## Overview
+
+Breakpoint is a system designed to **passively detect potholes and assess road quality** using the accelerometer built into everyday smartphones. As users drive, the application analyzes vibration data in real-time to:
+
+1.  **Classify road segments** by surface condition (e.g., smooth asphalt, rough gravel).
+2.  **Automatically identify potholes** based on sudden, characteristic vibration spikes.
+
+This collected data powers a **web-based heatmap visualization**, providing a clear, color-coded overview of real-world road conditions across monitored areas. This serves both drivers seeking smoother routes and infrastructure services needing insight into problematic segments.
+
+Beyond immediate visualization, Breakpoint functions as a **scalable infrastructure tool**. All gathered data is stored for longitudinal analysis and potential integration with:
+
+* Existing navigation applications.
+* Road maintenance services for smarter, data-driven repair planning.
+
+In essence, Breakpoint combines real-time driver awareness with crowdsourced infrastructure insights. It's designed to be **lightweight, frictionless, and effective**—turning every participating phone into a mobile road quality sensor and every trip into actionable data.
+
+---
+
+## ✨ Key Features
+
+* **Passive Sensing:** Utilizes the phone's accelerometer, requiring no user interaction during drives.
+* **Road Condition Classification:** Categorizes road surfaces based on vibration patterns.
+* **Automatic Pothole Detection:** Identifies sharp impacts indicative of potholes.
+* **Web-Based Heatmap:** Visualizes collected road quality data geographically.
+* **Scalable Architecture:** Designed for handling data from multiple users.
+
+---
+
+## 📸 Screenshots & Visuals
+
+**Web Interface:** Visualizing the collected road quality data.
+![Group 7](https://github.com/user-attachments/assets/e2bdbcb2-190c-41d9-bd1e-fe6b35b50723)
+
+**Mobile Application:** The data collection interface on the smartphone.
+![Rectangle 1](https://github.com/user-attachments/assets/ebc96e73-b364-45cc-b943-3e6c975b368d)
+
+**System Architecture:** Overview of the data flow.
 ![arch.png](arch.png)
 
-Breakpoint is a system that passively detects potholes and assesses road quality using a smartphone’s built-in accelerometer. As users drive, it analyzes vibrations to classify road segments by surface condition—ranging from smooth asphalt to rough gravel—and automatically identifies potholes based on sudden spikes.
-The collected data is visualized in a color-coded web-based heatmap, showing real-world road quality across the area. This provides both drivers and infrastructure services with a clear overview of problematic segments and rough zones.
-Breakpoint also serves as a scalable infrastructure tool. All collected data is stored for further analysis and can be integrated into existing navigation apps or shared with road maintenance services to support smarter repair planning.
-Breakpoint combines real-time driver protection with scalable, crowd-powered infrastructure insights. It’s lightweight, frictionless, and already working—turning every phone into a road quality sensor, and every trip into actionable data.
+---
+
+## 💻 Technology Stack (Example)
+
+* **Mobile App:** Flutter
+* **Backend:** Golang
+* **Frontend (Web Map):** NextJS, Mapbox GL JS
+* **Database:** PostgreSQL with PostGIS
+* **Infrastructure:** Docker, DigitalOcean
