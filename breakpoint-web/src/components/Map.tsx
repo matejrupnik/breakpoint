@@ -541,6 +541,7 @@ export default function Map({
       </div>
 
       <MapGL
+        attributionControl={false}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
         initialViewState={{
           longitude: mapCenter.longitude,
